@@ -58,6 +58,7 @@
         }
         .graph-container {
             width: 100%;
+            display: none; /* デフォルトで非表示 */
         }
         canvas {
             width: 100%;
@@ -116,7 +117,7 @@
         </div>
 
         <!-- グラフ -->
-        <div class="graph-container">
+        <div class="graph-container" id="graphContainer">
             <canvas id="paceChart"></canvas>
         </div>
     </div>
@@ -141,6 +142,13 @@
             if (isNaN(targetLapTime) || targetLapTime <= 0) return;
 
             let elapsedTimes = Array.from(document.querySelectorAll(".elapsedTime")).map(input => parseTime(input.value));
+
+            if (elapsedTimes.some(time => time !== null)) {
+                document.getElementById("graphContainer").style.display = "block"; // 入力があればグラフを表示
+            } else {
+                document.getElementById("graphContainer").style.display = "none"; // 入力がなければ非表示
+                return;
+            }
 
             let lapTimes = elapsedTimes.map((time, index) => index === 0 ? time : (time - elapsedTimes[index - 1]));
             let lapDifferences = lapTimes.map(time => (time !== null ? time - targetLapTime : null));
