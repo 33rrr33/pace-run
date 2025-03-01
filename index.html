@@ -27,7 +27,9 @@
         }
         .form-container {
             display: flex;
-            justify-content: space-around;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
             width: 100%;
             margin-bottom: 10px;
         }
@@ -36,25 +38,26 @@
             flex-direction: column;
             align-items: center;
             position: relative;
+            width: 90px;
         }
         label {
             font-size: 14px;
         }
-        .time-input {
-            width: 80px;
-            font-size: 16px;
-            text-align: center;
-            position: absolute;
-            left: 15px;
-            background: transparent;
-            border: none;
-            outline: none;
+        .time-wrapper {
+            display: flex;
+            align-items: center;
         }
         .fixed-time {
             font-size: 16px;
-            position: absolute;
-            left: 10px;
-            pointer-events: none;
+            font-weight: bold;
+            margin-right: 3px;
+        }
+        .time-input {
+            width: 40px;
+            font-size: 16px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
         button {
             font-size: 14px;
@@ -88,44 +91,60 @@
         <!-- 経過タイム入力 + 自動計算 -->
         <div class="form-container">
             <div class="input-group">
-                <label>1周目 経過タイム</label>
-                <span class="fixed-time">00:</span>
-                <input type="text" class="time-input elapsedTime" data-index="0" maxlength="2">
+                <label>1周目 経過</label>
+                <div class="time-wrapper">
+                    <span class="fixed-time">00:</span>
+                    <input type="text" class="time-input elapsedTime" data-index="0" maxlength="2">
+                </div>
             </div>
             <div class="input-group">
-                <label>2周目 経過タイム</label>
-                <span class="fixed-time">00:</span>
-                <input type="text" class="time-input elapsedTime" data-index="1" maxlength="2">
+                <label>2周目 経過</label>
+                <div class="time-wrapper">
+                    <span class="fixed-time">00:</span>
+                    <input type="text" class="time-input elapsedTime" data-index="1" maxlength="2">
+                </div>
             </div>
             <div class="input-group">
-                <label>3周目 経過タイム</label>
-                <span class="fixed-time">00:</span>
-                <input type="text" class="time-input elapsedTime" data-index="2" maxlength="2">
+                <label>3周目 経過</label>
+                <div class="time-wrapper">
+                    <span class="fixed-time">00:</span>
+                    <input type="text" class="time-input elapsedTime" data-index="2" maxlength="2">
+                </div>
             </div>
             <div class="input-group">
-                <label>4周目 経過タイム</label>
-                <span class="fixed-time">00:</span>
-                <input type="text" class="time-input elapsedTime" data-index="3" maxlength="2">
+                <label>4周目 経過</label>
+                <div class="time-wrapper">
+                    <span class="fixed-time">00:</span>
+                    <input type="text" class="time-input elapsedTime" data-index="3" maxlength="2">
+                </div>
             </div>
             <div class="input-group">
-                <label>5周目 経過タイム</label>
-                <span class="fixed-time">00:</span>
-                <input type="text" class="time-input elapsedTime" data-index="4" maxlength="2">
+                <label>5周目 経過</label>
+                <div class="time-wrapper">
+                    <span class="fixed-time">00:</span>
+                    <input type="text" class="time-input elapsedTime" data-index="4" maxlength="2">
+                </div>
             </div>
             <div class="input-group">
-                <label>6周目 経過タイム</label>
-                <span class="fixed-time">00:</span>
-                <input type="text" class="time-input elapsedTime" data-index="5" maxlength="2">
+                <label>6周目 経過</label>
+                <div class="time-wrapper">
+                    <span class="fixed-time">00:</span>
+                    <input type="text" class="time-input elapsedTime" data-index="5" maxlength="2">
+                </div>
             </div>
             <div class="input-group">
-                <label>7周目 経過タイム</label>
-                <span class="fixed-time">00:</span>
-                <input type="text" class="time-input elapsedTime" data-index="6" maxlength="2">
+                <label>7周目 経過</label>
+                <div class="time-wrapper">
+                    <span class="fixed-time">00:</span>
+                    <input type="text" class="time-input elapsedTime" data-index="6" maxlength="2">
+                </div>
             </div>
             <div class="input-group">
-                <label>8周目 経過タイム</label>
-                <span class="fixed-time">00:</span>
-                <input type="text" class="time-input elapsedTime" data-index="7" maxlength="2">
+                <label>8周目 経過</label>
+                <div class="time-wrapper">
+                    <span class="fixed-time">00:</span>
+                    <input type="text" class="time-input elapsedTime" data-index="7" maxlength="2">
+                </div>
             </div>
         </div>
 
@@ -148,7 +167,6 @@
             });
 
             let lapTimes = elapsedTimes.map((time, index) => index === 0 ? time : (time - elapsedTimes[index - 1]));
-            let lapDifferences = lapTimes.map(time => time - targetLapTime);
 
             let labels = Array.from({ length: 8 }, (_, i) => `周回${i + 1}`);
             let targetData = new Array(8).fill(targetLapTime);
