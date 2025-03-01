@@ -27,9 +27,9 @@
         }
         .form-container {
             display: flex;
-            justify-content: center;
             flex-wrap: wrap;
             gap: 10px;
+            justify-content: center;
             width: 100%;
             margin-bottom: 10px;
         }
@@ -37,7 +37,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            position: relative;
             width: 90px;
         }
         label {
@@ -46,11 +45,11 @@
         .time-wrapper {
             display: flex;
             align-items: center;
+            justify-content: center;
         }
         .fixed-time {
             font-size: 16px;
             font-weight: bold;
-            margin-right: 3px;
         }
         .time-input {
             width: 40px;
@@ -58,6 +57,7 @@
             text-align: center;
             border: 1px solid #ccc;
             border-radius: 4px;
+            margin-left: 5px; /* 00: と間隔をあける */
         }
         button {
             font-size: 14px;
@@ -170,10 +170,6 @@
 
             let labels = Array.from({ length: 8 }, (_, i) => `周回${i + 1}`);
             let targetData = new Array(8).fill(targetLapTime);
-            let upperBound10 = new Array(8).fill(targetLapTime + 10);
-            let lowerBound10 = new Array(8).fill(targetLapTime - 10);
-            let upperBound5 = new Array(8).fill(targetLapTime + 5);
-            let lowerBound5 = new Array(8).fill(targetLapTime - 5);
 
             if (!chart) {
                 const ctx = document.getElementById('paceChart').getContext('2d');
@@ -182,10 +178,6 @@
                     data: {
                         labels: labels,
                         datasets: [
-                            { label: "±10秒", data: upperBound10, borderColor: "orange", backgroundColor: "rgba(255,165,0,0.3)", fill: "-1" },
-                            { label: "±10秒", data: lowerBound10, borderColor: "orange", backgroundColor: "rgba(255,165,0,0.3)", fill: "-1" },
-                            { label: "±5秒", data: upperBound5, borderColor: "green", backgroundColor: "rgba(0,255,0,0.5)", fill: "-1" },
-                            { label: "±5秒", data: lowerBound5, borderColor: "green", backgroundColor: "rgba(0,255,0,0.5)", fill: "-1" },
                             { label: "目標", data: targetData, borderColor: "blue", borderWidth: 2, fill: false },
                             { label: "実測", data: lapTimes, borderColor: "red", borderWidth: 2, fill: false }
                         ]
@@ -193,7 +185,7 @@
                     options: { responsive: true, maintainAspectRatio: false }
                 });
             } else {
-                chart.data.datasets[5].data = lapTimes;
+                chart.data.datasets[1].data = lapTimes;
                 chart.update();
             }
         }
