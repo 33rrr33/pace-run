@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>持久走ペース可視化</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* スクロールなし */
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%;
+        }
+        .form-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        label {
+            font-size: 14px;
+        }
+        input {
+            width: 80px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .graph-container {
+            width: 100%;
+        }
+        canvas {
+            width: 100%;
+            height: 220px; /* iPad横向きで収まる高さ */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>持久走ペース可視化</h2>
+
+        <!-- 目標タイムの入力 -->
+        <div class="form-container">
+            <div class="input-group">
+                <label>目標ラップタイム（秒）</label>
+                <input type="number" id="targetTime" value="30" min="1">
+            </div>
+        </div>
+
+        <!-- 周回ごとの実測タイム -->
+        <div class="form-container">
+            <div class="input-group">
+                <label>1周目</label>
+                <input type="number" class="lapTime" data-index="0">
+            </div>
+            <div class="input-group">
+                <label>2周目</label>
+                <input type="number" class="lapTime" data-index="1">
+            </div>
+            <div class="input-group">
+                <label>3周目</label>
+                <input type="number" class="lapTime" data-index="2">
+            </div>
+            <div class="input-group">
+                <label>4周目</label>
+                <input type="number" class="lapTime" data-index="3">
+            </div>
+            <div class="input-group">
+                <label>5周目</label>
+                <input type="number" class="lapTime" data-index="4">
+            </div>
+            <div class="input-group">
+                <label>6周目</label>
+                <input type="number" class="lapTime" data-index="5">
+            </div>
+            <div class="input-group">
+                <label>7周目</label>
+                <input type="number" class="lapTime" data-index="6">
+            </div>
+            <div class="input-group">
+                <label>8周目</label>
+                <input type="number" class="lapTime" data-index="7">
+            </div>
+        </div>
+
+        <!-- グラフ -->
+        <div class="graph-container">
+            <canvas id="paceChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let chart;
+
+        function updateGraph() {
+            let targetLapTime = parseFloat(document.getElementById('targetTime').value);
+            if (isNaN(targetLapTime) || targetLapTime <= 0) return;
+
+            let times = Array.from(document.querySelectorAll(".lapTime")).map(input => parseFloat(input.value) || null);
+
+            let labels = Array.from({ length: 8 }, (_, i) => `周回${i + 1}`);
+            let targetData = new Array(8).fill(targetLapTime);
+            let upperBound5 = new Array(8).fill(targetLapTime + 5);
+            let lowerBound5 = new Array(8).fill(targetLapTime - 5);
+            let upperBound10 = new Array(8).fill(targetLapTime + 10);
+            let lowerBound10 = new Array(8).fill(targetLapTime - 10);
+
+            if (!chart) {
+                const ctx = document.getElementById('paceChart').getContext('2d');
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: "目標", data: targetData, borderColor: "blue", borderWidth: 2, fill: false },
+                            { label: "実測", data: times, borderColor: "red", borderWidth: 2, fill: false },
+                            { label: "±5秒", data: upperBound5, borderColor: "green", backgroundColor: "rgba(0,255,0,0.3)", fill: "-1" },
+                            { label: "±5秒", data: lowerBound5, borderColor: "green", backgroundColor: "rgba(0,255,0,0.3)", fill: "-1" }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            } else {
+                chart.data.datasets[1].data = times;
+                chart.update();
+            }
+        }
+
+        document.querySelectorAll(".lapTime, #targetTime").forEach(input => {
+            input.addEventListener("input", updateGraph);
+        });
+
+        updateGraph();
+    </script>
+
+</body>
+</html>
