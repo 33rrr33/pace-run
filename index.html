@@ -37,17 +37,18 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100px;
+            width: 120px;
         }
         label {
             font-size: 14px;
         }
         .time-input {
-            width: 70px;
+            width: 80px;
             font-size: 16px;
             text-align: center;
             border: 1px solid #ccc;
             border-radius: 4px;
+            padding: 5px;
         }
         button {
             font-size: 14px;
@@ -75,4 +76,111 @@
                 <label>目標ラップタイム（秒）</label>
                 <input type="number" id="targetTime" value="30" min="1">
                 <button onclick="updateGraph()">更新</button>
-    
+            </div>
+        </div>
+
+        <!-- 経過タイム入力（デジタル時計形式 MM:SS） -->
+        <div class="form-container">
+            <div class="input-group">
+                <label>1周目 経過</label>
+                <input type="text" class="time-input elapsedTime" data-index="0" placeholder="MM:SS">
+            </div>
+            <div class="input-group">
+                <label>2周目 経過</label>
+                <input type="text" class="time-input elapsedTime" data-index="1" placeholder="MM:SS">
+            </div>
+            <div class="input-group">
+                <label>3周目 経過</label>
+                <input type="text" class="time-input elapsedTime" data-index="2" placeholder="MM:SS">
+            </div>
+            <div class="input-group">
+                <label>4周目 経過</label>
+                <input type="text" class="time-input elapsedTime" data-index="3" placeholder="MM:SS">
+            </div>
+            <div class="input-group">
+                <label>5周目 経過</label>
+                <input type="text" class="time-input elapsedTime" data-index="4" placeholder="MM:SS">
+            </div>
+            <div class="input-group">
+                <label>6周目 経過</label>
+                <input type="text" class="time-input elapsedTime" data-index="5" placeholder="MM:SS">
+            </div>
+            <div class="input-group">
+                <label>7周目 経過</label>
+                <input type="text" class="time-input elapsedTime" data-index="6" placeholder="MM:SS">
+            </div>
+            <div class="input-group">
+                <label>8周目 経過</label>
+                <input type="text" class="time-input elapsedTime" data-index="7" placeholder="MM:SS">
+            </div>
+        </div>
+
+        <!-- グラフ -->
+        <div class="graph-container">
+            <canvas id="paceChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let chart;
+
+        function parseTime(timeStr) {
+            let parts = timeStr.split(":");
+            if (parts.length === 2) {
+                let minutes = parseInt(parts[0], 10);
+                let seconds = parseInt(parts[1], 10);
+                if (!isNaN(minutes) && !isNaN(seconds)) {
+                    return minutes * 60 + seconds;
+                }
+            }
+            return null;
+        }
+
+        function updateGraph() {
+            let targetLapTime = parseFloat(document.getElementById('targetTime').value);
+            if (isNaN(targetLapTime) || targetLapTime <= 0) return;
+
+            let elapsedTimes = Array.from(document.querySelectorAll(".elapsedTime")).map(input => parseTime(input.value));
+
+            let lapTimes = elapsedTimes.map((time, index) => index === 0 ? time : (time - elapsedTimes[index - 1]));
+            let lapDifferences = lapTimes.map(time => (time !== null ? time - targetLapTime : null));
+
+            let labels = Array.from({ length: 8 }, (_, i) => `周回${i + 1}`);
+            let targetData = new Array(8).fill(targetLapTime);
+            let upperBound10 = targetData.map(t => t + 10);
+            let lowerBound10 = targetData.map(t => t - 10);
+            let upperBound5 = targetData.map(t => t + 5);
+            let lowerBound5 = targetData.map(t => t - 5);
+
+            if (!chart) {
+                const ctx = document.getElementById('paceChart').getContext('2d');
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: "±10秒", data: upperBound10, borderColor: "orange", backgroundColor: "rgba(255,165,0,0.3)", fill: "-1" },
+                            { label: "±10秒", data: lowerBound10, borderColor: "orange", backgroundColor: "rgba(255,165,0,0.3)", fill: "-1" },
+                            { label: "±5秒", data: upperBound5, borderColor: "green", backgroundColor: "rgba(0,255,0,0.5)", fill: "-1" },
+                            { label: "±5秒", data: lowerBound5, borderColor: "green", backgroundColor: "rgba(0,255,0,0.5)", fill: "-1" },
+                            { label: "目標", data: targetData, borderColor: "blue", borderWidth: 2, fill: false },
+                            { label: "実測", data: lapTimes, borderColor: "red", borderWidth: 2, fill: false }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            } else {
+                chart.data.datasets[5].data = lapTimes;
+                chart.update();
+            }
+        }
+
+        document.querySelectorAll(".elapsedTime, #targetTime").forEach(input => {
+            input.addEventListener("input", updateGraph);
+        });
+
+        updateGraph();
+    </script>
+
+</body>
+</html>
