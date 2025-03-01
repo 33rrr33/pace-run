@@ -50,6 +50,11 @@
             border-radius: 4px;
             padding: 5px;
         }
+        .lap-time {
+            font-size: 14px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
         button {
             font-size: 14px;
             padding: 5px;
@@ -85,34 +90,42 @@
             <div class="input-group">
                 <label>1周目 経過</label>
                 <input type="text" class="time-input elapsedTime" data-index="0" placeholder="MM:SS">
+                <div class="lap-time" id="lapTime0">-</div>
             </div>
             <div class="input-group">
                 <label>2周目 経過</label>
                 <input type="text" class="time-input elapsedTime" data-index="1" placeholder="MM:SS">
+                <div class="lap-time" id="lapTime1">-</div>
             </div>
             <div class="input-group">
                 <label>3周目 経過</label>
                 <input type="text" class="time-input elapsedTime" data-index="2" placeholder="MM:SS">
+                <div class="lap-time" id="lapTime2">-</div>
             </div>
             <div class="input-group">
                 <label>4周目 経過</label>
                 <input type="text" class="time-input elapsedTime" data-index="3" placeholder="MM:SS">
+                <div class="lap-time" id="lapTime3">-</div>
             </div>
             <div class="input-group">
                 <label>5周目 経過</label>
                 <input type="text" class="time-input elapsedTime" data-index="4" placeholder="MM:SS">
+                <div class="lap-time" id="lapTime4">-</div>
             </div>
             <div class="input-group">
                 <label>6周目 経過</label>
                 <input type="text" class="time-input elapsedTime" data-index="5" placeholder="MM:SS">
+                <div class="lap-time" id="lapTime5">-</div>
             </div>
             <div class="input-group">
                 <label>7周目 経過</label>
                 <input type="text" class="time-input elapsedTime" data-index="6" placeholder="MM:SS">
+                <div class="lap-time" id="lapTime6">-</div>
             </div>
             <div class="input-group">
                 <label>8周目 経過</label>
                 <input type="text" class="time-input elapsedTime" data-index="7" placeholder="MM:SS">
+                <div class="lap-time" id="lapTime7">-</div>
             </div>
         </div>
 
@@ -144,19 +157,23 @@
             let elapsedTimes = Array.from(document.querySelectorAll(".elapsedTime")).map(input => parseTime(input.value));
 
             if (elapsedTimes.some(time => time !== null)) {
-                document.getElementById("graphContainer").style.display = "block"; // 入力があればグラフを表示
+                document.getElementById("graphContainer").style.display = "block";
             } else {
-                document.getElementById("graphContainer").style.display = "none"; // 入力がなければ非表示
+                document.getElementById("graphContainer").style.display = "none";
                 return;
             }
 
-            let lapTimes = elapsedTimes.map((time, index) => index === 0 ? time : (time - elapsedTimes[index - 1]));
-            let lapDifferences = lapTimes.map(time => (time !== null ? time - targetLapTime : null));
+            let lapTimes = elapsedTimes.map((time, index) => {
+                if (index === 0) return time;
+                return time !== null && elapsedTimes[index - 1] !== null ? time - elapsedTimes[index - 1] : null;
+            });
+
+            lapTimes.forEach((time, index) => {
+                document.getElementById(`lapTime${index}`).innerText = time !== null ? `${time} 秒` : "-";
+            });
 
             let labels = Array.from({ length: 8 }, (_, i) => `周回${i + 1}`);
             let targetData = new Array(8).fill(targetLapTime);
-            let upperBound10 = targetData.map(t => t + 10);
-            let lowerBound10 = targetData.map(t => t - 10);
             let upperBound5 = targetData.map(t => t + 5);
             let lowerBound5 = targetData.map(t => t - 5);
 
@@ -167,18 +184,15 @@
                     data: {
                         labels: labels,
                         datasets: [
-                            { label: "±10秒", data: upperBound10, borderColor: "orange", backgroundColor: "rgba(255,165,0,0.3)", fill: "-1" },
-                            { label: "±10秒", data: lowerBound10, borderColor: "orange", backgroundColor: "rgba(255,165,0,0.3)", fill: "-1" },
                             { label: "±5秒", data: upperBound5, borderColor: "green", backgroundColor: "rgba(0,255,0,0.5)", fill: "-1" },
                             { label: "±5秒", data: lowerBound5, borderColor: "green", backgroundColor: "rgba(0,255,0,0.5)", fill: "-1" },
                             { label: "目標", data: targetData, borderColor: "blue", borderWidth: 2, fill: false },
                             { label: "実測", data: lapTimes, borderColor: "red", borderWidth: 2, fill: false }
                         ]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false }
+                    }
                 });
             } else {
-                chart.data.datasets[5].data = lapTimes;
+                chart.data.datasets[3].data = lapTimes;
                 chart.update();
             }
         }
